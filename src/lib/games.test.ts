@@ -89,6 +89,7 @@ describe('games data-access helpers', () => {
             ]);
         });
 
+        /** Returns the titles of the games matching `filters`, in query order. */
         const titles = async (filters?: Parameters<typeof getGames>[1]): Promise<string[]> =>
             (await getGames(db, filters)).map((g) => g.title);
 
