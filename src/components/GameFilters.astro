@@ -93,4 +93,7 @@ const { categories, publishers, total } = Astro.props;
     form?.addEventListener('change', applyFilters);
     // Reset restores defaults after the event, so re-apply on the next tick.
     form?.addEventListener('reset', () => setTimeout(applyFilters, 0));
+    // The browser may restore form state after scripts run (Back/reload), so re-apply once it settles.
+    window.addEventListener('pageshow', () => setTimeout(applyFilters, 0));
+    applyFilters();
 </script>

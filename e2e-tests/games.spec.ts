@@ -183,4 +183,17 @@ test.describe('Game Filtering', () => {
     await expect(page.getByTestId('filter-status')).not.toHaveText(`Showing ${total} of ${total} games`);
     await expect(page.getByTestId('filter-empty-state')).toBeHidden();
   });
+
+  test('should keep results filtered when navigating back', async ({ page }) => {
+    await page.locator('input[name="category"]').first().check();
+    const visibleCards = page.locator('[data-testid="game-card"]:not([hidden])');
+    const filteredCount = await visibleCards.count();
+
+    await visibleCards.first().click();
+    await page.waitForURL(/\/game\//);
+    await page.goBack();
+
+    await expect(page.locator('input[name="category"]').first()).toBeChecked();
+    await expect(visibleCards).toHaveCount(filteredCount);
+  });
 });
