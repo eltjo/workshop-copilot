@@ -68,7 +68,14 @@ export async function getGameById(db: Database, id: number): Promise<Game | null
     return row ? mapGame(row) : null;
 }
 
-/** Games matching the given filters (categories are OR-ed, then AND-ed with the publisher), ordered by title. */
+/**
+ * Lists games matching the given filters, ordered by title.
+ * Categories are OR-ed together, then AND-ed with the publisher.
+ *
+ * @param db - Database instance to query.
+ * @param filters - Optional category and publisher filters; omitted filters match everything.
+ * @returns The matching games.
+ */
 export async function getGames(db: Database, filters: GameFilters = {}): Promise<Game[]> {
     const conditions: SQL[] = [];
     if (filters.categoryIds && filters.categoryIds.length > 0) {
@@ -83,12 +90,22 @@ export async function getGames(db: Database, filters: GameFilters = {}): Promise
     return rows.map(mapGame);
 }
 
-/** All categories ordered by name. */
+/**
+ * Lists all categories ordered by name.
+ *
+ * @param db - Database instance to query.
+ * @returns All categories.
+ */
 export async function getAllCategories(db: Database): Promise<Category[]> {
     return db.select({ id: categories.id, name: categories.name }).from(categories).orderBy(asc(categories.name));
 }
 
-/** All publishers ordered by name. */
+/**
+ * Lists all publishers ordered by name.
+ *
+ * @param db - Database instance to query.
+ * @returns All publishers.
+ */
 export async function getAllPublishers(db: Database): Promise<Publisher[]> {
     return db.select({ id: publishers.id, name: publishers.name }).from(publishers).orderBy(asc(publishers.name));
 }

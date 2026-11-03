@@ -1,9 +1,13 @@
 ---
 import type { Category, Publisher } from '../types/game';
 
+/** Props for the game filter form. */
 interface Props {
+    /** Categories offered as checkboxes. */
     categories: Category[];
+    /** Publishers offered in the select. */
     publishers: Publisher[];
+    /** Total number of games before filtering. */
     total: number;
 }
 
@@ -70,6 +74,10 @@ const { categories, publishers, total } = Astro.props;
     const emptyState = document.querySelector<HTMLElement>('[data-testid="filter-empty-state"]');
     const total = cards.length;
 
+    /**
+     * Shows only the cards matching the checked categories (any) and the selected publisher,
+     * then updates the status text and empty state.
+     */
     function applyFilters(): void {
         if (!form || !status) return;
         const categoryIds = new Set(
