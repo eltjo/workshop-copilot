@@ -134,3 +134,53 @@ test.describe('Game Listing and Navigation', () => {
     });
   });
 });
+
+test.describe('Game Filtering', () => {
+  test.beforeEach(async ({ page }) => {
+    await page.goto('/');
+    await expect(page.getByTestId('game-filters')).toBeVisible();
+  });
+
+  test('should filter by category and publisher and clear filters', async ({ page }) => {
+    const cards = page.getByTestId('game-card');
+    const total = await cards.count();
+    const firstCard = cards.first();
+    const categoryId = await firstCard.getAttribute('data-category-id');
+    const publisherId = await firstCard.getAttribute('data-publisher-id');
+
+    await test.step('Filter by category', async () => {
+      await page.getByTestId(`filter-category-${categoryId}`).check();
+      const visible = await cards.evaluateAll((els) => els.filter((e) => !(e as HTMLElement).hidden).length);
+      expect(visible).toBeGreaterThan(0);
+      await expect(page.getByTestId('filter-status')).toHaveText(`Showing ${visible} of ${total} games`);
+      await expect(page.locator(`[data-testid="game-card"]:not([hidden]):not([data-category-id="${categoryId}"])`)).toHaveCount(0);
+    });
+
+    await test.step('Combine with publisher', async () => {
+      await page.getByTestId('filter-publisher').selectOption(publisherId!);
+      await expect(
+        page.locator(`[data-testid="game-card"]:not([hidden]):not([data-publisher-id="${publisherId}"])`),
+      ).toHaveCount(0);
+      await expect(firstCard).toBeVisible();
+    });
+
+    await test.step('Clear filters', async () => {
+      await page.getByTestId('filter-clear').click();
+      await expect(page.locator('[data-testid="game-card"]:not([hidden])')).toHaveCount(total);
+      await expect(page.getByTestId('filter-status')).toHaveText(`Showing ${total} of ${total} games`);
+    });
+  });
+
+  test('should be operable with the keyboard', async ({ page }) => {
+    const firstCheckbox = page.locator('input[name="category"]').first();
+    const total = await page.getByTestId('game-card').count();
+
+    await firstCheckbox.focus();
+    await expect(firstCheckbox).toBeFocused();
+    await page.keyboard.press('Space');
+
+    await expect(firstCheckbox).toBeChecked();
+    await expect(page.getByTestId('filter-status')).not.toHaveText(`Showing ${total} of ${total} games`);
+    await expect(page.getByTestId('filter-empty-state')).toBeHidden();
+  });
+});
