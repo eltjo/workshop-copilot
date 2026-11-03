@@ -25,3 +25,11 @@ test.describe('Home Page', () => {
     await expect(page.getByText('Find your next game! And maybe even back one! Explore our collection!')).toBeVisible();
   });
 });
+
+test.describe('Home Page game card ratings', () => {
+  test('should show each game rating as stars', async ({ page }) => {
+    await page.goto('/');
+    const ratings = page.getByTestId('game-card-rating');
+    await expect(ratings.first()).toHaveAttribute('aria-label', /^\d\.\d \/ 5$|^No rating yet$/);
+  });
+});
