@@ -1,0 +1,20 @@
+---
+import { getStarFills } from '../lib/ratings';
+
+interface Props {
+    rating: number;
+    class?: string;
+}
+
+const { rating, class: className = '' } = Astro.props;
+---
+
+<span class:list={['text-yellow-400', className]} aria-hidden="true">
+    {getStarFills(rating).map((fill) =>
+        fill === 'half' ? (
+            <span class="bg-gradient-to-r from-yellow-400 from-50% to-slate-500 to-50% bg-clip-text text-transparent" data-testid="half-star">★</span>
+        ) : (
+            <span class={fill === 'empty' ? 'text-slate-500' : ''}>★</span>
+        ),
+    )}
+</span>
